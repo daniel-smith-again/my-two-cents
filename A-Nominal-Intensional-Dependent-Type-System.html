@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<head>
+<meta charset='utf-8'>
+<link rel='stylesheet' href='style.css'>
+</head>
+<body>
+<pre>
+ <a href="A-Nominal-Intensional-Dependent-Type-System.html">link</a>                                                                      <a href="index.html">home</a>
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                  A Nominal Intensional Dependent Type System                 ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+                            Background and Context
+                         ────────────────────────────
+   Programming languages which are statically typed rely on a type system to 
+express the notion of correctness. A type-checking algorithm will inspect a 
+program in that language, model its properties using the type system, and if the
+model obeys the rules of the type system, the algorithm will report that the
+program is "type safe".
+
+   The type system is normally a separate language from the actual programming 
+language. The programming language is called the "term" language and the type
+system language is called the "type language". The reason these two languages
+are separate is because the type language is normally a very simple language
+that isn't as expressive as the term language. This means the type language 
+can't express as many things as the term language, but the things it can 
+express are guaranteed to follow the rules and be "type safe".
+
+   Dependent type systems don't use a separate language, they use the same 
+language for both terms and types. This means that the type-level model of a 
+program is... the program itself. If you ask a mathemetician, they'll explain
+this using "dependent sums" and "dependent products". It's non-obvious how
+these have a computational interpretation, so I won't use them. An easier way 
+to describe dependent typing is using the lambda cube. A full dependently typed
+language is classified as a 
+         "higher order dependently typed polymorphic lambda calculus".
+In other words, you can use the same language to create a function from
+                                A) term to term
+                                B) term to type
+                                C) type to term
+                                D) type to type
+
+   Type assertions in a dependently typed language work just like assertions in
+every other language, except that the type in the assertion is a normal
+expression in the language. In pseudocode, if I wanted to make a variable that 
+binds an instance of "A", I would write,</pre>
+<math><mrow><mi>x</mi><mo>:</mo><mi>A</mi></mrow></math>
+<pre>
+And if I wanted to assert that the result of an expression is an instance of 
+type B, I would write,
+</pre>
+<math><mrow><mi>foo</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>:</mo><mi>B</mi></mrow></math>
+<pre>
+In both examples, A and B are terms, not types. That is to say they're valid 
+expressions by themselves, outside of a type constraint.
+
+Now, lets say that I had a function,
+</pre>
+<math><mrow><mi>inc</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math>
+<pre>What would the type of this function be? Simple...</pre>
+<math><mrow><mi>&lambda;</mi><mi>x</mi><mo>.</mo><mi>x</mi><mo>+</mo><mn>1</mn></mrow></math>
+<pre>
+But here's where things get tricky, let's say I had another function,
+</pre>
+<math><mrow><mi>add1</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>-</mo><mn>1</mn></mrow></math>
+<pre>and I wanted to assert that</pre>
+<math><mrow><mi>add1</mi><mo>:</mo><mi>inc</mi></mrow></math>
+<pre>
+This is difficult because the constraint is not constructed with a simplified 
+type language, but the whole term-level language. I can't create an abstract
+model of the constrained term anymore, I have to evaluate the term language 
+and I need whatever environment the term language depends on to be evaluated.
+
+   Here's a new word, Extensionality. It's the property that two functions which
+might have different constructions, still share the same image and preimage. For
+total functions with finite, countable images and preimages, you can decide if
+two functions are extensional (given enough time). Partial functions are a 
+different story. Now you have to grapple with the halting problem. If a function
+diverges, you will never be able to decide if its image and preimage are the 
+same as some other function, because you will never be able to identify all the
+members of the image/preimage. You will only have a partial image/preimage to
+work with. We got lucky with the example above because those two functions are
+trivially total and it's easy to see that they do the same thing just by 
+looking. In the real world, it's usually much more complicated.
+
+   This is the great big snag with dependently typed languages. It's probably
+the biggest reason why they haven't caught on like other paradigms and type 
+systems. If you want to use the same language in both the term and type level,
+you have to incorporate formal mathematical proofs into your program so that
+something like,
+</pre>
+<math><mrow><mi>infiniteloopA</mi><mo>:</mo><mi>infiniteloopB</mi></mrow></math>
+<pre>
+might actually typecheck before the heat death of the universe. You could say 
+there's two glaring issues with dependently typed languages...
+1) Good luck creating a formal mathematical proof for every little bit of your
+   program. Often times there's no proof that you could ever construct which 
+   will properly verify your program.
+2) Formal mathematical proofs are very poor at telling you if you've met 
+   product design's requirement that the top-left button should be purple on 
+   every second Tuesday.
+
+
+                Introduce Nominal Constraints and Intensionality
+             ──────────────────────────────────────────────────────
+   So the problem is that dependent types break down when you try to do any 
+moderately involved program verification with them. They break down a lot 
+because useful programming languages are full of diverging partial functions. 
+Especially in the embedded world that needs reliable, high uptime software, 
+the same mechanism that provides the uptime obfuscates lots of forms of 
+dependent type checking; looping and recursion.
+
+   My solution to this is to flip dependent type checking upside down. If you 
+have any ol' function. A mathemetician might look at it and ask, "Is evaluating
+this function the same as evaluating this other function?" A computer scientist
+would instead ask, "How can I predict and constrain the effects of evaluating 
+this function?" These are two entirely different questions. Only the first is 
+answered by extensionality. Ironically the latter is what most people are asking
+when they turn to dependent types for more control over type checking. Flip it 
+upside down. Instead of asking about extensionality, ask about intensionality. 
+How is this function constructed so that I can make predictions about what it 
+does?
+
+   The trick is that the second question is much, much easier to answer than 
+straight up extensionality. For example, maybe I have a function "foo" and I 
+want it to do the same thing as "bar". The easiest way to enforce this is to 
+make sure that "foo" calls "bar" somewhere in its body. That's exactly what 
+a Nominal Intensional Dependent Type System does.
+
+   Let's build up an intuition by asking a question. If I have a function,
+</pre>
+<math><mrow><mi>foo</mi><mo>:</mo><mi>A</mi><mo>&rightarrow;</mo><mi>B</mi></mrow></math>
+<pre>
+How many programs can I write that call foo, with A, that result in B?
+That's a simple question. The easiest answer is,
+</pre>
+<math><mrow><mo>let</mo><mi>x</mi><mo>=</mo><mi>A</mi><mo>,</mo><mspace width="0.5em"></mspace><mi>foo</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>
+<pre>
+But what about this program?
+</pre>
+<math><mrow><mi>bar</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>x</mi></mrow></math>
+<math><mrow><mi>bar</mi><mo>(</mo><mi>foo</mi><mo>(</mo><mi>A</mi><mo>)</mo><mo>)</mo></mrow></math>
+<pre>
+Or this program...
+</pre>
+<math><mrow><mi>baz</mi><mo>:</mo><mi>C</mi><mo>&rightarrow;</mo><mi>A</mi></mrow></math>
+<math><mrow><mi>bar</mi><mo>(</mo><mi>foo</mi><mo>(</mo><mi>baz</mi><mo>(</mo><mi>C</mi><mo>)</mo><mo>)</mo><mo>)</mo></mrow></math>
+<pre>
+...or this program...
+</pre>
+<math><mrow><mi>flip</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>p</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>;</mo><mi>K</mi><mo>(</mo><mi>m</mi><mo>)</mo><mo>;</mo><mi>foo</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>
+<pre>
+You might start to notice a pattern in these examples. There's certain ways that
+you can arrange a program where the flow will preserve some data. In the case 
+of these examples, I'm preserving A, until foo is applied to it, after which 
+I'm preserving B until it's yeilded. A Nominal Intensional Dependent Type 
+System provides a formal way to check this flow property in a program.
+
+</pre>
+</body>
+<footer>
+<pre>
+╭──────────────────────────────────────────────────────────────────────────────╮
+│                    This page is Copyright © Daniel Smith                     │
+╰──────────────────────────────────────────────────────────────────────────────╯
+</pre>
+</footer>

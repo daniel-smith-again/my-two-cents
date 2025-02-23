@@ -1,0 +1,6 @@
+html{font-size:calc((8px + 1vw + 1vh) / 2);font-family:monospace;color:darkslategrey;background-color:linen;height:100%;}
+body{width:80ch;margin:auto;min-height:calc(100% - 1lh);height:100%;display:flex;flex-direction:column;justify-content:start;align-items:start;}
+footer{justify-self:end;align-self:end;}
+a{text-decoration:none;color:peru;background-color:inherit;}
+a:hover{text-decoration:underline;}
+math{display:block;width:fit-content;color:darkslateblue;margin:auto;}
