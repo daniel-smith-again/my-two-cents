@@ -1,4 +1,4 @@
-@font-face{ font-family:customfont; src:url('./OverpassMono-VariableFont_wght.ttf'); }
+@font-face{ font-family:customfont; src:url('./OverpassMonoVariable.ttf'); }
 @font-face{ font-family:noto; src:url('./NotoSansMonoVariable.ttf');}
 html{ font-size:calc((12px + 1vw + 1vh) / 2); color:#002000ff; background-color:linen; height:100%; }
 * {font-variant-ligatures:none;}
