@@ -234,8 +234,64 @@ a subset of the preimage and image of <code>A</code>. From the perspective of a
 computer scientist interested in constraining program behavior to a verifiable
 subset, this partial extensional relation is very desirable.
 
+   The informal rules for how to satisfy a NID type constraint are as follows,
+
+1) The constrained function must have the same result type(s) as the 
+   constraining function.
+
+2) The constrained function is not required to have the same parameter types as
+   the constraining function.
+
+3) If the constraining function features a function application, the 
+   constrained function must also apply that same function by name.
+
+4) The constrained function may include functions which satisfy identity 
+   anywhere in its definition.
+
+5) The constrained function may insert an arbitrary number of sequential 
+   expressions at any point which preserves the function applications of the
+   constraining function.
+
+
+                               Some More Examples
+                            ────────────────────────
+Here's some rapid fire examples which are all valid according to NID type 
+rules...
+
+                     ┏╾─────────────────────────────────╼┓
+                     ╿                                   ╿
+                     │ (define foo (x → (x + 1)))        │
+                     │ (define (bar : foo)               │
+                     │         (x →                      │
+                     │             (1 + (let m = x       │
+                     │              in (m ← (m + 1),     │
+                     │                  m ← (m + 1)))))) │
+                     ╽                                   ╽
+                     ┗╾─────────────────────────────────╼┛
+
+             ┏╾─────────────────────────────────────────────────╼┓
+             ╿                                                   ╿
+             │ (define foo (x → (A), (B), (C)))                  │
+             │ (define (bar : foo) (x → (P), (Q), (R),           │
+             │                          (A), (K), (X),           │
+             │                          (Y), (Z (Z' (Z'' (B)))), │
+             │                          (C)))                    │
+             ╽                                                   ╽
+             ┗╾─────────────────────────────────────────────────╼┛
+
+        ┏╾────────────────────────────────────────────────────────────╼┓
+        ╿                                                              ╿
+        │ (define foo (x → (P), (Q (R))))                              │
+        │ (define (bar : foo) (x → (I), (J), (K), (P),                 │
+        │                      (let id = (x → x)                       │
+        │                       in ((compose id id id id Q id id) (R)) │
+        │                      )))                                     │
+        ╽                                                              ╽
+        ┗╾────────────────────────────────────────────────────────────╼┛
+
                                 Formal Nonsense                                 
                              ─────────────────────                              
+Nonsense will be added once I finish making it formal...
 </pre>
 </body>
 <footer>
