@@ -2,6 +2,7 @@
 <head>
 <meta charset='utf-8'>
 <link rel='stylesheet' href='style.css'>
+<title>A Nominal Intensional Dependent Type System</title>
 </head>
 <body>
 <pre>
@@ -168,7 +169,50 @@ of these examples, I'm preserving A, until foo is applied to it, after which
 I'm preserving B until it's yeilded. A Nominal Intensional Dependent Type 
 System provides a formal way to check this flow property in a program.
 
+
+                             How this works in nᵗʰ
+                          ───────────────────────────
+   In the programming language, nᵗʰ, which I'm developing, Nominal Intensional
+Dependent (NID) typing works according to the following rules. 
+
+1) NID typing can only be engaged using implicit quantification.
+2) It will enforce that the function applications in the type appear in the 
+   constrained program.
+3) The constrained program is permitted to operate on subtypes of the types 
+   given in the constraint.
+
+   There's two ways that NID typing can be applied, to a function and to a 
+variable. The two methods entail very different things. Using NID typing with a
+function might look like the following...
+
+               ┏╾─────────────────────────────────────────────╼┓
+               ╿                                               ╿
+               │ <code>(define inc (n : Number) → (+ n 1))</code>           │
+               │ <code>(define (foo : inc Natural) n → (+ (* n 2) 1)</code> │
+               ╽                                               ╽
+               ┗╾─────────────────────────────────────────────╼┛
+
+   There's two things to note in this example. The first is the implicit 
+quantification expression, <code>(inc Natural)</code> which quantifies the function 
+<code>inc</code> over the Natural numer type. This follows the first rule of engaging
+NID typing. The second thing to note is that both <code>inc</code> and <code>foo</code> yield a
+result with 1 added to it. If <code>foo</code> did not include an addition, 
+the NID typing algorithm would issue a type error. <code>foo</code> cannot be an 
+intensional subtype of <code>inc</code> if it does not include the same function 
+applications that <code>inc</code> does.
+
+                                Formal Nonsense                                 
+                             ─────────────────────                              
+   The Nominal Intensional Dependent Type System is an extension of the
+<a target="_blank" href="https://doi.org/10.1016/0890-5401(88)90005-3">Calculus of Constructions</a> which provides an additional lambda construction
+denoted by the greek letter, φ. This constructor takes two lambda abstractions,
+and constructs a third abstraction which preserves the applications of the first
+within the body of the second.
 </pre>
+<math><mfrac>
+<mrow><mi>&Gamma;</mi><mo>&vdash;</mo><mi>&lambda;</mi><mi>x</mi><mo>.</mo></mrow>
+<mrow></mrow>
+</mfrac></math>
 </body>
 <footer>
 <pre>
