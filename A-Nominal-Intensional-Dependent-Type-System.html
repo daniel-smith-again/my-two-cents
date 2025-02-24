@@ -178,13 +178,13 @@ can engage it simply by using a normal function as a type. Normally, you can
 create symbolic functions that match over things abstractly, such as this 
 "type level" dependent function,
 
-                   ┏╾──────────────────────────────────────╼┓
-                   ╿                                        ╿
-                   │ (define return-a-type (Boolean → Type) │
-                   │        (True    → Natural)             │
-                   │        (False   → Rational))           │
-                   ╽                                        ╽
-                   ┗╾──────────────────────────────────────╼┛
+                ┏╾───────────────────────────────────────────╼┓
+                ╿                                             ╿
+                │ (define return-a-type (Boolean → Type)      │
+                │                       (True    → Natural)   │
+                │                       (False   → Rational)) │
+                ╽                                             ╽
+                ┗╾───────────────────────────────────────────╼┛
 which can be used as a signature for other, more specific functions,
 
                 ┏╾────────────────────────────────────────────╼┓
