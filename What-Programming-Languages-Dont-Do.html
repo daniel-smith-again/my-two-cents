@@ -29,15 +29,71 @@ a runny nose when I could talk about the malady causing it instead. So below,
 you'll find a list of the current "maladies" which plague programming languages
 and their tooling.
 
-Compilers that need the internet.
 
-Inability to deal with executable formats.
+                           Behold, my list of gripes.
+                           ──────────────────────────
 
-IEEE 754 Floating Point or nothing.
+┌
+│ Math
+└
+       This one is low hanging fruit. Every programming language with the 
+exception of Scheme and Mathematica do not do math. If a language provides 
+anything at all outside of integers, it's always IEEE 754 floating point.
+That's nice and all, but it's not math. At best, you're accurate to the 
+thousandth's place. Unless you chain more than a few operations together in 
+which case rounding error gives you nonsense answers. If you want math, the 
+answer is normally to "use GMP". There's lots of room for improvement in this 
+space.
 
-"Checkers"
+
+┌
+│ Executable Formats
+└
+       There is a prevalent inability to properly work with executable formats.
+It's also an inexplicable prevalence. Executable formats haven't changed in the
+last thirty years. There's three: PE, ELF, or MACH. That's it. That's the three.
+Additionally, those three all essentially do the same thing, they have a 
+hash-table or flat list of names (essentially goto labels) and flat segments of
+machine instructions or binary data that those names refer to. That's it. 
+That's all that's in an executable format. Yet somehow, we still have problems
+like simply embedding binary data in a binary data segment, name mangling, and
+ABI mismatch within the same language and toolset. These are hard problems,
+but the reason they're hard is because we have incredibly poor support for 
+manipulating these very simply tabular binary formats.
 
 
+┌
+│ Garbage Collection or Bust
+└
+       Your only two options are garbage collection or manual memory management.
+If you don't like either one, you can use borrow checked manual memory
+management. Wow. 
+
+       There's reference counting, but tell me one language that's being 
+actively used which relies on a referenced counted runtime. I'll wait.
+
+
+┌
+│ "Checkers"
+└
+       Static typing is a plague upon this earth. No, not that static typing, 
+the other static typing. The one people are talking about when they say "HM" 
+and nobody knows what they mean. The static typing that uses anything beginning
+with the word "Algebraic". Those kinds of static typing are legos. They scratch
+the itch in our brain because it feels like you're removing entropy, but you're
+not actually accomplishing anything. Real type systems perform some form of 
+static verification. For example, the SPARK subset of Ada. Real type systems 
+check for type errors beyond mismatched independent variables. In the ML family
+of languages, you can write a function signature that looks like  
+                                   a -&gt; a -&gt; b
+.... and they expect us to take them seriously. All this tells me is that the 
+return argument is different, and the first two arguments are the same type. 
+Fascinating! Clearly this is at the forefront of modern programming language 
+design. 
+
+       The issue isn't necessarily that these kinds of type systems are wrong,
+it's just that they're touted as making your program safer or enforcing some 
+desirable property beyond "a" being the same as "a" and different than "b".
 
 </pre>
 </div>
