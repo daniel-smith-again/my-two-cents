@@ -72,6 +72,23 @@ management. Wow.
        There's reference counting, but tell me one language that's being 
 actively used which relies on a referenced counted runtime. I'll wait.
 
+       Memory heaps are increasingly implemented and provided as general purpose
+container abstractions, with specific heap models being created for certain 
+usage patterns. For example, look at how many malloc libraries there are.
+There's one for single threaded performance, there's one for concurrency, 
+there's one for storing lots of small objects, there's one for storing lots of 
+big objects. There's others built into things like databases or JIT runtimes 
+which are specialized for the specific memory usage patterns of those 
+applications.
+
+       What's stopping us from using multiple memory management strategies for 
+different parts of our application? Apathy. ...Well that and most malloc 
+libraries are implemented assuming you'll make a lifetime commitment to using 
+that specific library forever after, in sickness and in health, 'til segfault 
+do you part. They don't play well with each other and it's highly discouraged to
+attempt linking to multiple mallocs at the same time. Why are things this way?
+An astounding failure of imagination.
+
 
 ┌
 │ "Checkers"
@@ -79,21 +96,107 @@ actively used which relies on a referenced counted runtime. I'll wait.
        Static typing is a plague upon this earth. No, not that static typing, 
 the other static typing. The one people are talking about when they say "HM" 
 and nobody knows what they mean. The static typing that uses anything beginning
-with the word "Algebraic". Those kinds of static typing are legos. They scratch
+with the word "Algebraic". Those kinds of systems are legos. They scratch
 the itch in our brain because it feels like you're removing entropy, but you're
-not actually accomplishing anything. Real type systems perform some form of 
-static verification. For example, the SPARK subset of Ada. Real type systems 
-check for type errors beyond mismatched independent variables. In the ML family
+not actually accomplishing anything. Go buy another useless day planner and leave
+the rest of us alone. Real type systems perform some form of static 
+verification. For example, the SPARK subset of Ada. Real type systems check for
+type errors beyond mismatched independent variables. In the ML family
 of languages, you can write a function signature that looks like  
                                    a -&gt; a -&gt; b
 .... and they expect us to take them seriously. All this tells me is that the 
 return argument is different, and the first two arguments are the same type. 
 Fascinating! Clearly this is at the forefront of modern programming language 
-design. 
+design.
 
        The issue isn't necessarily that these kinds of type systems are wrong,
 it's just that they're touted as making your program safer or enforcing some 
 desirable property beyond "a" being the same as "a" and different than "b".
+
+       There's another mind virus that comes along with this kind of static 
+typing called "Dependent Types". In a nutshell, Dependent Typing is the practice 
+of forcing your type checker to evaluate your program before you run it in the
+hope of detecting runtime errors. It's somewhat useful in the trivial cases that
+wouldn't have required any kind of dependent type system in the first place. 
+The end result is that the compiler takes entirely too long to perform its 
+static checking and gives you an enormous amound of false positives. Dependent 
+types are hailed as some sort of holy grail, but they mostly manifest as a local 
+maxima for friction in the user experience.
+
+
+┌
+│ Programmers are Stupid
+└
+       The worst faux pas I can think of is design patterns in a language that
+assume the programmer is stupid and defenseless and therefore must have no 
+access to anything significant. This is usually touted as some baloney like 
+"Now your junior engineers won't write bugs anymore!"
+In reality, the programmer is rendered stupid because in losing access to 
+anything significant, they are prevented from acomplishing anything significant.
+These kinds of languages are aggravating at best and infuriating at worst.
+
+
+┌
+│ I just want to ship my code, please.
+└
+       There is a proliferation of interpreted, bytecoded, JITed languages which 
+for some mysterious reason all refuse to be shippable in any static fashion. 
+Maybe, if you're lucky, you can embed them in a C program, or link your 
+C program to the interpreter's shared library bindings. The usual cop-out is 
+to tell the user "just call into the language from C". I see your cop-out and 
+raise you "just writing the entire thing in C and not touching your useless 
+interpreter at all". 
+       Most of the time you have to write a shell/command line script to invoke
+the plain interpreter and disguise the entire mess as an executable. This is 
+normal life for Java and Python applications. Lisp and Scheme are the same way.
+(Small shout out to SBCL here for at least providing the ability to core-dump 
+the lisp shell into an actual executable file. This is the closest anybody's 
+come to being actually shippable.) 
+
+       The most offensive part of all of this is that all of these languages 
+provide a bytecode representation. So close yet so far away from native. Where 
+is your stand alone bytecode interpreter? Why can I not embed a bytecode segment
+inside the interpreter as an executable? Why can I not embed my source code as 
+a data segment inside the interpreter's executable file?? The Guile programming
+language actually does this with it's modules. You can emit a module using the
+ELF object format. But, is it executable? No. You have to invoke the godforsaken
+interpreter with a script to load the ELF as a module. Why is this necessary? 
+Cut out the middleman! There's so much design space to explore here with packing
+your various dynamic features into an executable and nobody's even looking. 
+It's tragic. It's pathetic. It's apathetic.
+
+
+┌
+│ I Don't See What You Mean
+└
+       There was a really great paper written a while ago called 
+"The Next 700 Programming Languages" by Peter Landin. It proposed a hypothetical
+language called ISWIM. It dared to pose the question "what if a language was 
+actually useful?". It proposed ideas for how a high-level abstract language 
+might run on hardware at the low-level without interpretation. It provided a
+general purpose control operator that can be composed to create all other 
+control flow. Any structured control flow one desires is expressible, or simply
+optional. It dared to bridge the gap of niches between Algol and Lisp. It
+defined a subset of itself that would not require garbage collection to execute.
+At the same time, the portions that did require GC were not memory intensive or
+full of indirection. It outlined rules for forming abstract equivalences between
+programs based on symbolic interpretation.
+
+       People marveled at the concentration of new ideas in a single academic 
+paper. They pondered how many of these ideas would actually appear in the 
+future. They concluded, with deep, painful irony, that the completely agree 
+with Landin, programming should definitely look more like math and also, like, 
+use functions and stuff. Just how ironic is this? The following is a real quote
+from the paper,
+
+     "It follows that functional programming has little to do with 
+     functional notation. It is a trivial and pointless task to rearrange
+     some piece of symbolism into prefixed operators and heavy bracketing.
+     It is an intellectually demanding activity to characterized some 
+     physical or logical system as a set of entities and functional
+     relations among them."
+
+Deep, deep irony.
 
 </pre>
 </div>
